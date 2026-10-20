@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
+import { signUp } from "@/lib/auth-client";
 
 export default function SignUpForm() {
   const [formData, setFormData] = useState({
@@ -14,16 +15,81 @@ export default function SignUpForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+  
+  // Validation error states
+  const [passwordError, setPasswordError] = useState("");
+  const [repeatPasswordError, setRepeatPasswordError] = useState("");
+
+  const validatePassword = (pass: string) => {
+    // Rules: min 8 chars, 1 uppercase, 1 lowercase, 1 special character
+    const minLength = pass.length >= 8;
+    const hasUppercase = /[A-Z]/.test(pass);
+    const hasLowercase = /[a-z]/.test(pass);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
+
+    if (!pass) {
+      return "";
+    }
+    if (!minLength || !hasUppercase || !hasLowercase || !hasSpecialChar) {
+      return "Password must be at least 8 characters and include uppercase, lowercase, and a special character.";
+    }
+    return "";
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "password") {
+      setPasswordError(validatePassword(value));
+      // Real-time check for repeat password match if it has value
+      if (formData.repeatPassword && value !== formData.repeatPassword) {
+        setRepeatPasswordError("Passwords do not match.");
+      } else {
+        setRepeatPasswordError("");
+      }
+    }
+
+    if (name === "repeatPassword") {
+      if (value && value !== formData.password) {
+        setRepeatPasswordError("Passwords do not match.");
+      } else {
+        setRepeatPasswordError("");
+      }
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
+
+    // Final checks before submit
+    const passError = validatePassword(formData.password);
+    if (passError) {
+      setPasswordError(passError);
+      return;
+    }
+
+    if (formData.password !== formData.repeatPassword) {
+      setRepeatPasswordError("Passwords do not match.");
+      return;
+    }
+
+    // payload
+    const payload = {
+      username: formData?.username,
+      email: formData?.email,
+      password: formData?.password
+    };
+
     // Handle signup logic here (BetterAuth integration later)
-    console.log("Form submitted:", formData);
+    console.log("Signup payload before auth:", payload);
+
+    const { data: resData, error } = await signUp.email({
+      name: payload?.username,
+      email: payload?.email,
+      password: payload?.password
+    });
+    console.log("Signup payload after auth:", resData, error);
   };
 
   return (
@@ -141,7 +207,11 @@ export default function SignUpForm() {
               value={formData.password}
               onChange={handleChange}
               placeholder="••••••••"
-              className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm text-gray-900 placeholder-gray-400"
+              className={`block w-full pl-10 pr-10 py-2 border rounded-md focus:outline-none focus:ring-1 text-sm text-gray-900 placeholder-gray-400 ${
+                passwordError
+                  ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:ring-gray-900 focus:border-gray-900"
+              }`}
             />
             <button
               type="button"
@@ -152,6 +222,9 @@ export default function SignUpForm() {
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
+          {passwordError && (
+            <p className="mt-1 text-xs text-red-600 font-medium">{passwordError}</p>
+          )}
         </div>
 
         {/* Repeat Password Field */}
@@ -171,7 +244,11 @@ export default function SignUpForm() {
               value={formData.repeatPassword}
               onChange={handleChange}
               placeholder="••••••••"
-              className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm text-gray-900 placeholder-gray-400"
+              className={`block w-full pl-10 pr-10 py-2 border rounded-md focus:outline-none focus:ring-1 text-sm text-gray-900 placeholder-gray-400 ${
+                repeatPasswordError
+                  ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:ring-gray-900 focus:border-gray-900"
+              }`}
             />
             <button
               type="button"
@@ -182,6 +259,9 @@ export default function SignUpForm() {
               {showRepeatPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
+          {repeatPasswordError && (
+            <p className="mt-1 text-xs text-red-600 font-medium">{repeatPasswordError}</p>
+          )}
         </div>
 
         {/* Submit Button */}
