@@ -4,13 +4,18 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Menu, X, User, LogOut, ChevronDown, ChevronUp } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
+
+  const router = useRouter();
   
   const { data: sessionData, isPending } = useSession();
+  console.log("Session form nav:", sessionData);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close desktop dropdown when clicking outside
@@ -34,7 +39,13 @@ const Navbar = () => {
 
   const handleSignOut = async() => {
     // BetterAuth signout logic here
-    await signOut();
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push('/sign-in');
+        }
+      }
+    });
 
     // console.log("Signing out...");
     setIsDropdownOpen(false);
@@ -99,7 +110,7 @@ const Navbar = () => {
                         <p className="text-sm font-medium text-slate-800 truncate">{userName}</p>
                       </div>
 
-                      <Link href="/profile" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <Link href="/dashboard/profile" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                         <User className="w-4 h-4 text-gray-500" /> Profile
                       </Link>
 
