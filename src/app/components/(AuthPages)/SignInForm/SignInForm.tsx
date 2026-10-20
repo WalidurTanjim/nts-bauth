@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { signIn } from "@/lib/auth-client";
 
 export default function SignInForm() {
   const [formData, setFormData] = useState({
@@ -17,10 +18,16 @@ export default function SignInForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     // BetterAuth signin logic here
-    console.log("Form submitted:", formData);
+    console.log("Signin payload before auth:", formData);
+
+    const { data: resData, error } = await signIn.email({
+      email: formData?.email,
+      password: formData?.password
+    })
+    console.log("Signin payload before auth:", resData, error);
   };
 
   return (
