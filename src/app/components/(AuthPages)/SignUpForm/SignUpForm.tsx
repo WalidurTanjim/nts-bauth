@@ -4,8 +4,14 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
 import { signUp } from "@/lib/auth-client";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignUpForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  // console.log("CallbackURL from SignUpForm:", callbackUrl);
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -87,8 +93,16 @@ export default function SignUpForm() {
     const { data: resData, error } = await signUp.email({
       name: payload?.username,
       email: payload?.email,
-      password: payload?.password
+      password: payload?.password,
+      callbackURL: callbackUrl
     });
+
+    if(error) {
+      console.error(error);
+    }else{
+      router.push(callbackUrl);
+      router.refresh();
+    }
     console.log("Signup payload after auth:", resData, error);
   };
 

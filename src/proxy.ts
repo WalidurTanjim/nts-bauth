@@ -8,7 +8,10 @@ export async function proxy(request: NextRequest) {
     })
 
     if(!session) {
-        return NextResponse.redirect(new URL("/sign-in", request.url));
+        const signInUrl = new URL("/sign-in", request?.url);
+        console.log("Signin url from proxy:", signInUrl);
+        signInUrl.searchParams.set("callbackUrl", request?.nextUrl?.pathname);
+        return NextResponse.redirect(signInUrl);
     }
 
     return NextResponse.next();

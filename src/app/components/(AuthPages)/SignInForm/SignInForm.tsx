@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignInForm() {
   const [formData, setFormData] = useState({
@@ -12,6 +13,11 @@ export default function SignInForm() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  // console.log("CallbackURL from SignInForm:", callbackUrl);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -25,8 +31,16 @@ export default function SignInForm() {
 
     const { data: resData, error } = await signIn.email({
       email: formData?.email,
-      password: formData?.password
+      password: formData?.password,
+      callbackURL: callbackUrl
     })
+
+    if(error) {
+      console.error("Signin error:", error);
+    }else {
+      router.push(callbackUrl);
+      router.refresh();
+    }
     console.log("Signin payload before auth:", resData, error);
   };
 
@@ -164,7 +178,7 @@ export default function SignInForm() {
       {/* Signup Redirect Link */}
       <div className="mt-6 text-center text-sm text-gray-600">
         Don&apos;t have an account?{" "}
-        <Link href="/sign-up" className="font-semibold text-gray-900 hover:underline">
+        <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="font-semibold text-gray-900 hover:underline">
           Signup
         </Link>
       </div>
