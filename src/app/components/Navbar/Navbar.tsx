@@ -37,7 +37,7 @@ const Navbar = () => {
 
             {/* Signup Button (Visible ONLY on lg and larger) */}
             <div className="hidden lg:block">
-              <Link href="/signup" className="bg-gray-900 text-white hover:bg-gray-800 font-medium px-4 py-2 rounded-md transition-colors">Signup</Link>
+              <Link href="/sign-up" className="bg-gray-900 text-white hover:bg-gray-800 font-medium px-4 py-2 rounded-md transition-colors">Signup</Link>
             </div>
 
             {/* Hamburger Button (Visible on sm & md, hidden on lg) */}
@@ -65,7 +65,7 @@ const Navbar = () => {
             <Link href="/signin" onClick={() => setIsOpen(false)} className="block md:hidden text-center text-gray-600 hover:text-gray-900 font-medium px-4 py-2 border border-gray-300 rounded-md">Signin</Link>
 
             {/* Signup Button in menu for small and medium devices */}
-            <Link href="/signup" onClick={() => setIsOpen(false)} className="block text-center bg-gray-900 text-white hover:bg-gray-800 font-medium px-4 py-2 rounded-md">Signup</Link>
+            <Link href="/sign-up" onClick={() => setIsOpen(false)} className="block text-center bg-gray-900 text-white hover:bg-gray-800 font-medium px-4 py-2 rounded-md">Signup</Link>
           </div>
         </div>
       )}
