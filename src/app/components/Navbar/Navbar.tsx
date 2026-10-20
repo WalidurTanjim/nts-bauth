@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Menu, X, User, LogOut, ChevronDown, ChevronUp } from "lucide-react";
-import { useSession } from "@/lib/auth-client";
+import { signOut, useSession } from "@/lib/auth-client";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,9 +32,11 @@ const Navbar = () => {
     }
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async() => {
     // BetterAuth signout logic here
-    console.log("Signing out...");
+    await signOut();
+
+    // console.log("Signing out...");
     setIsDropdownOpen(false);
     setIsOpen(false);
     setIsMobileProfileOpen(false);
@@ -93,25 +95,15 @@ const Navbar = () => {
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
                       <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-xs text-gray-500">Signed in as</p>
-                        <p className="text-sm font-medium text-gray-900 truncate">{userName}</p>
+                        {/* <p className="text-xs text-gray-500">Signed in as</p> */}
+                        <p className="text-sm font-medium text-slate-800 truncate">{userName}</p>
                       </div>
 
-                      <Link
-                        href="/profile"
-                        onClick={() => setIsDropdownOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                      >
-                        <User className="w-4 h-4 text-gray-500" />
-                        Profile
+                      <Link href="/profile" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                        <User className="w-4 h-4 text-gray-500" /> Profile
                       </Link>
 
-                      <button
-                        onClick={handleSignOut}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors text-left"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Signout
+                      <button onClick={handleSignOut} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors text-left"> <LogOut className="w-4 h-4" />Signout
                       </button>
                     </div>
                   )}
